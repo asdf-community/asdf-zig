@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+# shellcheck disable=SC1090
+source "$(dirname "$0")/../lib/json.bash"
+
+trap cleanup SIGINT SIGTERM ERR
+
+cleanup() {
+  trap - SIGINT SIGTERM ERR
+  rm -rf "$ASDF_INSTALL_PATH"
+  echo
+  echo -e "\e[33mCleanup:\e[m Something went wrong!"
+  echo
+  echo "$(caller): ${BASH_COMMAND}"
+}
+
+fail() {
+  echo -e "\e[31mFail:\e[m $*"
+  exit 1
+}
+
+install_zig() {
+  local install_type=$1
+  local version=$2
+  local install_path=$3
+
+  if [ "$install_type" != "version" ]; then
+    fail "asdf-zig supports release installs only"
+  fi
+
+  local platform
+
+  case "$OSTYPE" in
+    darwin*) platform="macos" ;;
+    freebsd*) platform="freebsd" ;;
+    linux*) platform="linux" ;;
+    *) fail "Unsupported platform" ;;
+  esac
+
+  local architecture
+
+  case "$(uname -m)" in
+    aarch64* | arm64) architecture="aarch64" ;;
+    armv7*) architecture="armv7a" ;;
+    i686*) architecture="i386" ;;
+    riscv64*) architecture="riscv64" ;;
+    x86_64*) architecture="x86_64" ;;
+    *) fail "Unsupported architecture" ;;
+  esac
+
+  local json
+  json=$(curl --fail --silent --location https://ziglang.org/download/index.json)
+
+  local download_url
+  download_url=$(
+    json_parse "$json" |
+      grep "$version" |
+      grep "${architecture}-${platform}" |
+      grep "tarball" |
+      awk 'NR==1 { print $2 }' |
+      tr -d '"'
+  )
+
+  local source_path="${install_path}/zig-${platform}-${architecture}-${version}.tar.xz"
+
+  echo "∗ Downloading and installing Zig..."
+  curl --fail --silent --location --create-dirs --output "$source_path" "$download_url"
+  tar -xf "$source_path" -C "$install_path" --strip-components=1
+  mkdir -p "${install_path}/bin"
+  ln -s "${install_path}/zig" "${install_path}/bin/zig"
+  echo "The installation was successful!"
+}
+
+install_zig "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH"

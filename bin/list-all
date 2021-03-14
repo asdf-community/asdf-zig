@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -Eeo pipefail
+
+# shellcheck disable=SC1090
+source "$(dirname "$0")/../lib/json.bash"
+
+json=$(curl --fail --silent --location https://ziglang.org/download/index.json)
+
+sort_versions() {
+  sed 'h; s/[+-]/./g; s/.p\([[:digit:]]\)/.z\1/; s/$/.z/; G; s/\n/ /' |
+    LC_ALL=C sort -t. -k 1,1 -k 2,2n -k 3,3n -k 4,4n -k 5,5n | awk '{print $2}'
+}
+
+json_parse "$json" |
+  sed 's/^\[\(.*\)\].*$/\1/' |
+  grep -Eo '[0-9]+.[0-9]+.[0-9]+' |
+  uniq |
+  sort_versions |
+  xargs echo
