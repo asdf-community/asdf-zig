@@ -56,9 +56,7 @@ install_zig() {
   local download_url
   download_url=$(
     json_parse "$json" |
-      grep "$version" |
-      grep "${architecture}-${platform}" |
-      grep "tarball" |
+      grep "\[\"$version\",\"${architecture}-${platform}\",\"tarball\"\]" |
       awk 'NR==1 { print $2 }' |
       tr -d '"'
   )
