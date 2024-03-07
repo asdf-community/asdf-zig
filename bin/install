@@ -54,12 +54,16 @@ install_zig() {
   json=$(curl --fail --silent --location https://ziglang.org/download/index.json)
 
   local download_url
-  download_url=$(
-    json_parse "$json" |
-      grep "\[\"$version\",\"${architecture}-${platform}\",\"tarball\"\]" |
-      awk 'NR==1 { print $2 }' |
-      tr -d '"'
-  )
+  if [[ $version == *"+"* ]]; then
+    download_url="https://ziglang.org/builds/zig-${platform}-${architecture}-${version}.tar.xz"
+  else
+    download_url=$(
+      json_parse "$json" |
+        grep "\[\"$version\",\"${architecture}-${platform}\",\"tarball\"\]" |
+        awk 'NR==1 { print $2 }' |
+        tr -d '"'
+    )
+  fi
 
   local source_path="${install_path}/zig-${platform}-${architecture}-${version}.tar.xz"
 
