@@ -15,7 +15,7 @@ sort_versions() {
 list_all_versions() {
   json_parse "$json" |
     sed 's/^\[\(.*\)\].*$/\1/' |
-    grep -Eo '"master"|[0-9]+\.[0-9]+\.[0-9]+'  |
+    grep -Eo '"master"|[0-9]+\.[0-9]+\.[0-9]+' |
     tr -d '"' |
     uniq
 }
