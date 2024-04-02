@@ -68,12 +68,10 @@ install_zig() {
 
   echo "∗ Downloading and installing Zig..."
   curl --fail --progress-bar --location --create-dirs --output "$source_path" "$download_url"
-  
   local computed_shasum="$(shasum -a 256 "$source_path" | awk '{print $1}')"
 
-  if [[ "$computed_shasum" != "$expected_shasum" ]]; then
+  if [[ $computed_shasum != "$expected_shasum" ]]; then
     version=$(json_parse "$json" | grep "\[\"master\",\"version\"\]" | awk '{print $2}' | tr -d '"')
-   
     fail "High Security Alert: The computed shasum does not match the expected shasum. Please verify the integrity of the downloaded file and try again."
   fi
 

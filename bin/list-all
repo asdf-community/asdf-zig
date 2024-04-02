@@ -5,8 +5,7 @@ set -Eo pipefail
 # shellcheck disable=SC1091
 source "$(dirname "$0")/../lib/json.bash"
 
-# json=$(curl --fail --progress-bar  --location https://ziglang.org/download/index.json)
-json=$(cat mock.json)
+json=$(curl --fail --progress-bar  --location https://ziglang.org/download/index.json)
 latest_version=$(json_parse "$json" | grep "\[\"master\",\"version\"\]" | awk '{print $2}' | tr -d '"')
 
 sort_versions() {
