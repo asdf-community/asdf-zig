@@ -63,12 +63,16 @@ install_zig() {
       tr -d '"'
   )
 
-  local expected_shasum=$(json_parse "$json" | grep "\[\"$version\",\"${architecture}-${platform}\",\"shasum\"\]" | awk '{print $2}' | tr -d '"')
-  local source_path="${install_path}/zig-${platform}-${architecture}-${version}.tar.xz"
+  local expected_shasum
+  local source_path
+  local computed_shasum
+
+  expected_shasum=$(json_parse "$json" | grep "\[\"$version\",\"${architecture}-${platform}\",\"shasum\"\]" | awk '{print $2}' | tr -d '"')
+  source_path="${install_path}/zig-${platform}-${architecture}-${version}.tar.xz"
 
   echo "∗ Downloading and installing Zig..."
   curl --fail --progress-bar --location --create-dirs --output "$source_path" "$download_url"
-  local computed_shasum="$(shasum -a 256 "$source_path" | awk '{print $1}')"
+  computed_shasum="$(shasum -a 256 "$source_path" | awk '{print $1}')"
 
   if [[ $computed_shasum != "$expected_shasum" ]]; then
     version=$(json_parse "$json" | grep "\[\"master\",\"version\"\]" | awk '{print $2}' | tr -d '"')
