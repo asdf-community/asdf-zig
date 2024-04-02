@@ -25,6 +25,6 @@ source "$(dirname "$0")/../lib/chech_and_update_master.bash"
 if [[ "$status" == "rollback" ]]; then
     rollback_master "0.12.0-dev.3508+a6ed3e6d2"
 else
-    chech_master "$version" "$platform" "$architecture" "$json"
+    check_master "$version" "$platform" "$architecture" "$json"
 fi
 

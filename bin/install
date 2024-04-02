@@ -4,6 +4,7 @@ set -eo pipefail
 
 # shellcheck disable=SC1091
 source "$(dirname "$0")/../lib/json.bash"
+source "$(dirname "$0")/../lib/chech_and_update_master.bash"
 
 trap cleanup SIGINT SIGTERM ERR
 
@@ -53,7 +54,7 @@ install_zig() {
   local json
   json=$(curl --fail --progress-bar --location https://ziglang.org/download/index.json)
 
-  chech_master "$version" "$platform" "$architecture" "$json"
+  check_master "$version" "$platform" "$architecture" "$json"
 
   local download_url
   download_url=$(

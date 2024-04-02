@@ -7,7 +7,7 @@ fail() {
   exit 1
 }
 
-chech_master() {
+check_master() {
     local version="$1"
     local platform="$2"
     local architecture="$3"

@@ -5,7 +5,7 @@ set -Eo pipefail
 # shellcheck disable=SC1091
 source "$(dirname "$0")/../lib/json.bash"
 
-json=$(curl --fail --progress-bar  --location https://ziglang.org/download/index.json)
+json=$(curl --fail --progress-bar --location https://ziglang.org/download/index.json)
 
 sort_versions() {
   sed 'h; s/[+-]/./g; s/.p\([[:digit:]]\)/.z\1/; s/$/.z/; G; s/\n/ /' |
