@@ -2,14 +2,10 @@
 
 [Zig](https://ziglang.org) plugin for asdf version manager
 
-## Build History
-
-[![Build history](https://buildstats.info/github/chart/asdf-community/asdf-zig?branch=master)](https://github.com/asdf-community/asdf-zig/actions)
-
 ## Installation
 
 ```bash
-asdf plugin-add zig https://github.com/asdf-community/asdf-zig.git
+asdf plugin-add zig https://github.com/zigcc/asdf-zig.git
 ```
 
 ## Usage
