@@ -51,7 +51,7 @@ install_zig() {
   esac
 
   local json
-  json=$(curl --fail --silent --location https://ziglang.org/download/index.json)
+  json=$(curl --fail --progress-bar --location https://ziglang.org/download/index.json)
 
   local download_url
   download_url=$(
@@ -60,15 +60,30 @@ install_zig() {
       awk 'NR==1 { print $2 }' |
       tr -d '"'
   )
+  local expected_shasum
+  expected_shasum=$(
+    json_parse "$json" |
+      grep "\[\"$version\",\"${architecture}-${platform}\",\"shasum\"\]" |
+      awk '{print $2}' |
+      tr -d '"'
+  )
 
   local source_path="${install_path}/zig-${platform}-${architecture}-${version}.tar.xz"
 
   echo "∗ Downloading and installing Zig..."
-  curl --fail --silent --location --create-dirs --output "$source_path" "$download_url"
+  curl --fail --progress-bar --location --create-dirs --output "$source_path" "$download_url"
+
+  local actual_shasum
+  actual_shasum="$(shasum -a 256 "$source_path" | awk '{print $1}')"
+
+  if [[ "${expected_shasum}" != "${actual_shasum}" ]];then
+    fail "Checksum not same, expected: ${expected_shasum}, actual: ${actual_shasum}, file: ${source_path}"
+  fi
+
   tar -xf "$source_path" -C "$install_path" --strip-components=1
   mkdir -p "${install_path}/bin"
   ln -s "${install_path}/zig" "${install_path}/bin/zig"
-  echo "The installation was successful!"
+  echo "${version} was installed successful!"
 }
 
 install_zig "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH"
