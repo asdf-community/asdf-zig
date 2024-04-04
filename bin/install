@@ -76,7 +76,7 @@ install_zig() {
   local actual_shasum
   actual_shasum="$(shasum -a 256 "$source_path" | awk '{print $1}')"
 
-  if [[ ${expected_shasum} != "${actual_shasum}" ]];then
+  if [ "${expected_shasum}" != "${actual_shasum}" ]; then
     fail "Checksum not same, expected: ${expected_shasum}, actual: ${actual_shasum}, file: ${source_path}"
   fi
 
