@@ -9,7 +9,7 @@
 ## Installation
 
 ```bash
-asdf plugin-add zig https://github.com/asdf-community/asdf-zig.git
+asdf plugin add zig https://github.com/asdf-community/asdf-zig.git
 ```
 
 ## Usage
