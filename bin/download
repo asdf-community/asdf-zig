@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+current_script_path=${BASH_SOURCE[0]}
+plugin_dir=$(dirname "$(dirname "$current_script_path")")
+
+mkdir -p "$ASDF_DOWNLOAD_PATH"
+
+release_file="${ASDF_DOWNLOAD_PATH}/zig-${ASDF_INSTALL_VERSION}.tar.xz"
+
+"${plugin_dir}/lib/utils.py" download "${ASDF_INSTALL_VERSION}" "${release_file}"
+tar -xf "$release_file" -C "$ASDF_DOWNLOAD_PATH" --strip-components=1
+rm "$release_file"
