@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+
+jobs:
+  script-test:
+    env:
+      ASDF_DOWNLOAD_PATH: /tmp/asdf-download
+      ASDF_INSTALL_VERSION: 0.14.1
+      ASDF_INSTALL_TYPE: version
+      ASDF_INSTALL_PATH: /tmp/asdf-install
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          bin/download
+      - run: |
+          bin/install
+      - run: |
+          ${ASDF_INSTALL_PATH}/bin/zig env
+
+  plugin-test:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: asdf_plugin_test
+        uses: asdf-vm/actions/plugin-test@v3
+        with:
+          command: zig env

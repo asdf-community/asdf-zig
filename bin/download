@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+
+download() {
+  local download_path="$1"
+  local version="$2"
+  local release_file="${download_path}/${version}.tar.xz"
+  mkdir -p "$download_path"
+
+  "${SCRIPT_DIR}/../lib/utils.py" download "${version}" "${release_file}"
+  tar -xf "$release_file" -C "$download_path" --strip-components=1
+  rm "$release_file"
+}
+
+download "$ASDF_DOWNLOAD_PATH" "$ASDF_INSTALL_VERSION"
