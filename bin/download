@@ -2,13 +2,17 @@
 
 set -euo pipefail
 
-current_script_path=${BASH_SOURCE[0]}
-plugin_dir=$(dirname "$(dirname "$current_script_path")")
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
-mkdir -p "$ASDF_DOWNLOAD_PATH"
+download() {
+  local download_path="$1"
+  local version="$2"
+  local release_file="${download_path}/${version}.tar.xz"
+  mkdir -p "$download_path"
 
-release_file="${ASDF_DOWNLOAD_PATH}/zig-${ASDF_INSTALL_VERSION}.tar.xz"
+  "${SCRIPT_DIR}/../lib/utils.py" download "${version}" "${release_file}"
+  tar -xf "$release_file" -C "$download_path" --strip-components=1
+  rm "$release_file"
+}
 
-"${plugin_dir}/lib/utils.py" download "${ASDF_INSTALL_VERSION}" "${release_file}"
-tar -xf "$release_file" -C "$ASDF_DOWNLOAD_PATH" --strip-components=1
-rm "$release_file"
+download "$ASDF_DOWNLOAD_PATH" "$ASDF_INSTALL_VERSION"

@@ -1,6 +1,6 @@
 <div align="center">
 
-# asdf-zig [![Build](https://github.com/zigcc/asdf-zig/actions/workflows/build.yml/badge.svg)](https://github.com/zigcc/asdf-zig/actions/workflows/build.yml)
+# asdf-zig [![Build](https://github.com/asdf-community/asdf-zig/actions/workflows/build.yml/badge.svg)](https://github.com/asdf-community/asdf-zig/actions/workflows/build.yml)
 
 [Zig](http://ziglang.org/) plugin for the [asdf version manager](https://asdf-vm.com).
 
@@ -16,7 +16,7 @@
 After installing [asdf](https://asdf-vm.com/guide/getting-started.html), install the plugin by running:
 
 ```shell
-asdf plugin add zig https://github.com/zigcc/asdf-zig.git
+asdf plugin add zig https://github.com/asdf-community/asdf-zig.git
 ```
 
 Then use `asdf-zig` to install zig:
@@ -40,4 +40,4 @@ install & manage versions.
 
 # License
 
-See [LICENSE](LICENSE) © [zigcc](https://github.com/zigcc/)
+See [LICENSE](LICENSE)

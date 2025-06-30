@@ -14,7 +14,7 @@ import logging
 
 INDEX_URL = os.getenv("ASDF_ZIG_INDEX_URL", "https://ziglang.org/download/index.json")
 HTTP_TIMEOUT = int(os.getenv("ASDF_ZIG_HTTP_TIMEOUT", "30"))
-USER_AGENT = "asdf-zig (https://github.com/zigcc/asdf-zig)"
+USER_AGENT = "asdf-zig (https://github.com/asdf-community/asdf-zig)"
 
 # https://github.com/mlugg/setup-zig/blob/main/mirrors.json
 # If any of these mirrors are down, please open an issue!
