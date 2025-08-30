@@ -16,6 +16,9 @@ install_version() {
         cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
         mkdir -p "$install_path/bin"
         mv "$install_path/zig" "$install_path/bin/zig"
+        if test -x "$install_path/zls"; then
+          mv "$install_path/zls" "$install_path/bin/zls"
+        fi
 
         local tool_cmd="zig"
         if ! test -x "$install_path/bin/$tool_cmd"; then
@@ -24,6 +27,9 @@ install_version() {
         fi
 
         echo "zig $version installation was successful!"
+        if test -x "$install_path/bin/zls"; then
+          echo "zls $version also get installed!"
+        fi
     ) || (
         rm -rf "$install_path"
         fail "An error occurred while installing $TOOL_NAME $version."

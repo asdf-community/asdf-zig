@@ -4,6 +4,9 @@
 
 [Zig](http://ziglang.org/) plugin for the [asdf version manager](https://asdf-vm.com).
 
+As a bonus, this plugin supports installing zls as well, so zls and zig version can match exactly.
+
+
 </div>
 
 # Dependencies
@@ -31,8 +34,11 @@ asdf install zig latest
 # Set a version globally (on your ~/.tool-versions file)
 asdf set --home zig latest
 
-# Now asdf-zig commands are available
+# Now zig commands are available
 zig version
+
+# Also you can check zls match zig version
+zls version
 ```
 
 Check [asdf](https://github.com/asdf-vm/asdf) readme for more instructions on how to

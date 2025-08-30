@@ -11,7 +11,7 @@ jobs:
   script-test:
     env:
       ASDF_DOWNLOAD_PATH: /tmp/asdf-download
-      ASDF_INSTALL_VERSION: 0.14.1
+      ASDF_INSTALL_VERSION: 0.15.1
       ASDF_INSTALL_TYPE: version
       ASDF_INSTALL_PATH: /tmp/asdf-install
     strategy:
@@ -22,6 +22,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
+      - uses: astral-sh/ruff-action@v3
       - run: |
           bin/download
       - run: |
