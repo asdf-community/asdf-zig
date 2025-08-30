@@ -7,12 +7,17 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 download() {
   local download_path="$1"
   local version="$2"
-  local release_file="${download_path}/${version}.tar.xz"
+  local zig_outfile="${download_path}/zig-${version}.tar.xz"
+  local zls_outfile="${download_path}/zls-${version}.tar.xz"
   mkdir -p "$download_path"
 
-  "${SCRIPT_DIR}/../lib/utils.py" download "${version}" "${release_file}"
-  tar -xf "$release_file" -C "$download_path" --strip-components=1
-  rm "$release_file"
+  "${SCRIPT_DIR}/../lib/utils.py" download "${version}" "${zig_outfile}" "${zls_outfile}"
+  tar -xf "$zig_outfile" -C "$download_path" --strip-components=1
+  if [ -f "$zls_outfile" ]; then
+    tar -xf "$zls_outfile" -C "$download_path"
+    rm "$zls_outfile"
+  fi
+  rm "$zig_outfile"
 }
 
 download "$ASDF_DOWNLOAD_PATH" "$ASDF_INSTALL_VERSION"
