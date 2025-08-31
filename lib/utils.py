@@ -61,6 +61,15 @@ def fetch_index():
         return json.loads(body)
 
 
+def format_size(size_in_bytes):
+    """Convert a size in bytes to a human-readable format (K, M, G, etc.)."""
+    for unit in ['B', 'K', 'M', 'G', 'T', 'P']:
+        if size_in_bytes < 1024:
+            return f'{size_in_bytes:.2f}{unit}'
+        size_in_bytes /= 1024
+    return f'{size_in_bytes:.2f}P'  # Handle extremely large sizes
+
+
 def query_zls(zig_version):
     url = f'https://releases.zigtools.org/v1/zls/select-version?zig_version={zig_version}&compatibility=full'
     with http_get(url) as response:
@@ -76,8 +85,8 @@ def all_versions():
 
 
 def download_and_check(url, out_file, expected_shasum, total_size):
-    logging.info(f'Begin download tarball({total_size}) from {url} to {out_file}...')
-    chunk_size = 1024 * 1024  # 1M chunks
+    logging.info(f'Begin download tarball({format_size(total_size)}) from {url} to {out_file}...')
+    chunk_size = 1024 * 1024 * 2  # 2M chunks
     sha256_hash = hashlib.sha256()
     with http_get(url) as response:
         read_size = 0
@@ -89,7 +98,7 @@ def download_and_check(url, out_file, expected_shasum, total_size):
                     (read_size / total_size) * 100 if total_size > 0 else 0
                 )
                 logging.info(
-                    f'Downloaded: {read_size}/{total_size} bytes ({progress_percentage:.2f}%)'
+                    f'Downloaded: {format_size(read_size)}/{format_size(total_size)} bytes ({progress_percentage:.2f}%)'
                 )
                 if not chunk:
                     break  # eof
