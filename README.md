@@ -6,7 +6,6 @@
 
 As a bonus, this plugin supports installing zls as well, so zls and zig version can match exactly.
 
-
 </div>
 
 # Dependencies
@@ -22,13 +21,23 @@ After installing [asdf](https://asdf-vm.com/guide/getting-started.html), install
 asdf plugin add zig https://github.com/asdf-community/asdf-zig.git
 ```
 
-Then use `asdf-zig` to install zig:
+or update an existing installation:
+
+```shell
+asdf plugin update zig
+```
+
+Then use `asdf-zig` to manage zig:
 
 ```shell
 # Show all installable versions
 asdf list all zig
 
 # Install specific version
+
+asdf install zig 0.15.1
+
+# or install latest tagged version with
 asdf install zig latest
 
 # Set a version globally (on your ~/.tool-versions file)
@@ -37,7 +46,8 @@ asdf set --home zig latest
 # Now zig commands are available
 zig version
 
-# Also you can check zls match zig version
+# You can also check the ZLS version.
+# It is designed to be highly compatible with the specific Zig version you installed.
 zls version
 ```
 
@@ -46,4 +56,4 @@ install & manage versions.
 
 # License
 
-See [LICENSE](LICENSE)
+[Apache License 2.0](LICENSE)

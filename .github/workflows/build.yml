@@ -29,6 +29,7 @@ jobs:
           bin/install
       - run: |
           ${ASDF_INSTALL_PATH}/bin/zig env
+          ${ASDF_INSTALL_PATH}/bin/zls version
 
   plugin-test:
     strategy:

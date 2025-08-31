@@ -26,9 +26,10 @@ install_version() {
             exit 1
         fi
 
-        echo "zig $version installation was successful!"
+        echo "Zig $version installation was successful!"
         if test -x "$install_path/bin/zls"; then
-          echo "zls $version also get installed!"
+          zls_version=$($install_path/bin/zls version)
+          echo "ZLS $zls_version, which is highly compatible with Zig $version, was also installed successfully!"
         fi
     ) || (
         rm -rf "$install_path"
