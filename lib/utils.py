@@ -143,7 +143,8 @@ def download(version, zig_outfile, zls_outfile):
     index = fetch_index()
     # Resolve 'latest' to the actual latest version
     if version == 'latest':
-        versions = all_versions()
+        versions = list(k for k in index.keys() if k != 'master')
+        versions.sort(key=lambda v: tuple(map(int, v.split('.'))))
         version = versions[-1]
     if version not in index:
         raise Exception(f'There is no such version: {version}')
