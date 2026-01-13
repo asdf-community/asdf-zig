@@ -141,6 +141,11 @@ def download_tarball(out_file, tarball_info, use_mirror=True):
 
 def download(version, zig_outfile, zls_outfile):
     index = fetch_index()
+    # Resolve 'latest' to the actual latest version
+    if version == 'latest':
+        versions = list(k for k in index.keys() if k != 'master')
+        versions.sort(key=lambda v: tuple(map(int, v.split('.'))))
+        version = versions[-1]
     if version not in index:
         raise Exception(f'There is no such version: {version}')
 
@@ -156,12 +161,16 @@ def download(version, zig_outfile, zls_outfile):
     tarball_info = links[link_key]
     download_tarball(zig_outfile, tarball_info)
 
-    zls_links = query_zls(version)
-    if link_key not in zls_links:
-        return
+    try:
+        zls_links = query_zls(version)
+        if link_key not in zls_links:
+            return
 
-    tarball_info = zls_links[link_key]
-    download_tarball(zls_outfile, tarball_info, use_mirror=False)
+        tarball_info = zls_links[link_key]
+        download_tarball(zls_outfile, tarball_info, use_mirror=False)
+    except Exception as e:
+        logging.warning(f'Failed to download zls: {e}')
+        # zls download is optional, so we don't fail the entire installation
 
 
 def main(args):
