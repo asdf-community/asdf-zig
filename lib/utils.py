@@ -161,6 +161,12 @@ def download(version, zig_outfile, zls_outfile):
     tarball_info = links[link_key]
     download_tarball(zig_outfile, tarball_info)
 
+    if version == 'master':
+        logging.warning(
+            'ZLS is not available for Zig master. You will need to build ZLS from source. See: https://github.com/zigtools/zls'
+        )
+        return
+
     try:
         zls_links = query_zls(version)
         if link_key not in zls_links:
