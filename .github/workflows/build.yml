@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - master
   pull_request:
 
 
@@ -43,3 +44,5 @@ jobs:
         uses: asdf-vm/actions/plugin-test@v4
         with:
           command: zig env
+          giturl: ${{ github.event.pull_request.head.repo.html_url || github.event.repository.html_url }}
+          gitref: ${{ github.event.pull_request.head.sha || github.sha }}
