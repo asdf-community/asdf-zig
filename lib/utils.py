@@ -16,13 +16,24 @@ INDEX_URL = os.getenv('ASDF_ZIG_INDEX_URL', 'https://ziglang.org/download/index.
 HTTP_TIMEOUT = int(os.getenv('ASDF_ZIG_HTTP_TIMEOUT', '30'))
 USER_AGENT = 'asdf-zig (https://github.com/asdf-community/asdf-zig)'
 
-# https://github.com/mlugg/setup-zig/blob/main/mirrors.json
+# https://ziglang.org/download/community-mirrors.txt
 # If any of these mirrors are down, please open an issue!
+# Last update at 2026-04-14
 MIRRORS = [
-    'https://pkg.machengine.org/zig',
+    'https://pkg.hexops.org/zig',
     'https://zigmirror.hryx.net/zig',
     'https://zig.linus.dev/zig',
+    'https://zig.squirl.dev',
+    'https://zig.mirror.mschae23.de/zig',
+    'https://ziglang.freetls.fastly.net',
+    'https://zig.tilok.dev',
+    'https://zig-mirror.tsimnet.eu/zig',
+    'https://zig.karearl.com/zig',
+    'https://pkg.earth/zig',
     'https://fs.liujiacai.net/zigbuilds',
+    'https://zigmirror.com',
+    'https://zig.chainsafe.dev',
+    'https://zig.savalione.com',
 ]
 OS_MAPPING = {
     'darwin': 'macos',
