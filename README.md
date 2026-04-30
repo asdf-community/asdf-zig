@@ -35,7 +35,7 @@ asdf list all zig
 
 # Install specific version
 
-asdf install zig 0.15.1
+asdf install zig 0.16.0
 
 # or install latest tagged version with
 asdf install zig latest

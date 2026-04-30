@@ -99,22 +99,31 @@ def download_and_check(url, out_file, expected_shasum, total_size):
     logging.info(f'Begin download tarball({format_size(total_size)}) from {url} to {out_file}...')
     chunk_size = 1024 * 1024 * 2  # 2M chunks
     sha256_hash = hashlib.sha256()
+    is_tty = sys.stdout.isatty()
+    bar_width = 40
     with http_get(url) as response:
         read_size = 0
         with open(out_file, 'wb') as f:
             while True:
                 chunk = response.read(chunk_size)
-                read_size += len(chunk)
-                progress_percentage = (
-                    (read_size / total_size) * 100 if total_size > 0 else 0
-                )
-                logging.info(
-                    f'Downloaded: {format_size(read_size)}/{format_size(total_size)} bytes ({progress_percentage:.2f}%)'
-                )
                 if not chunk:
-                    break  # eof
+                    break
+                read_size += len(chunk)
                 sha256_hash.update(chunk)
                 f.write(chunk)
+                pct = read_size / total_size if total_size > 0 else 0
+                if is_tty:
+                    filled = int(bar_width * pct)
+                    bar = '█' * filled + '░' * (bar_width - filled)
+                    sys.stdout.write(f'\r  [{bar}] {pct * 100:5.1f}%  {format_size(read_size)}/{format_size(total_size)}')
+                    sys.stdout.flush()
+                else:
+                    logging.info(
+                        f'Downloaded: {format_size(read_size)}/{format_size(total_size)} bytes ({pct * 100:.2f}%)'
+                    )
+    if is_tty:
+        sys.stdout.write('\n')
+        sys.stdout.flush()
 
     actual = sha256_hash.hexdigest()
     if actual != expected_shasum:
@@ -207,4 +216,10 @@ def main(args):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(message)s')
-    main(sys.argv[1:])
+    try:
+        main(sys.argv[1:])
+    except KeyboardInterrupt:
+        sys.stdout.write('\n')
+        sys.stdout.flush()
+        logging.info('Download cancelled by user.')
+        sys.exit(130)
