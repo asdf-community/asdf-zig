@@ -54,6 +54,36 @@ zls version
 Check [asdf](https://github.com/asdf-vm/asdf) readme for more instructions on how to
 install & manage versions.
 
+# Custom Versions
+
+This plugin supports installing custom zig versions that are not in the official release index.
+
+## Why?
+
+The official `asdf-zig` can only support versions listed at `https://ziglang.org/download/index.json`. But zig evolves fast, and sometimes you need to stick with a specific dev version like `0.12.0-dev.2139+e025ad7b4`.
+
+## How to use custom versions
+
+1. Create the custom versions directory and file:
+
+```bash
+mkdir -p ~/.asdf/custom/zig
+echo '{"0.12.0-dev.2139+e025ad7b4": {}, "0.12.0-dev.1828+225fe6ddb": {}}' > ~/.asdf/custom/zig/versions.json
+```
+
+2. Your custom versions will now appear in `asdf list all zig` and can be installed with `asdf install zig <version>`.
+
+## Installing master version
+
+You can also install the current master version of zig:
+
+```bash
+asdf list all zig  # Shows master_<version> at the end
+asdf install zig master_<version>
+```
+
+The master version is prefixed with `master_` to distinguish it from release versions.
+
 # License
 
 [Apache License 2.0](LICENSE)
