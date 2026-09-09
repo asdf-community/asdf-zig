@@ -15,6 +15,7 @@ import logging
 INDEX_URL = os.getenv('ASDF_ZIG_INDEX_URL', 'https://ziglang.org/download/index.json')
 HTTP_TIMEOUT = int(os.getenv('ASDF_ZIG_HTTP_TIMEOUT', '30'))
 USER_AGENT = 'asdf-zig (https://github.com/asdf-community/asdf-zig)'
+CUSTOM_VERSIONS_PATH = os.path.expanduser('~/.asdf/custom/zig/versions.json')
 
 # https://ziglang.org/download/community-mirrors.txt
 # If any of these mirrors are down, please open an issue!
@@ -88,10 +89,30 @@ def query_zls(zig_version):
         return json.loads(body)
 
 
+def load_custom_versions():
+    """Load custom versions from ~/.asdf/custom/zig/versions.json"""
+    if not os.path.exists(CUSTOM_VERSIONS_PATH):
+        return []
+    try:
+        with open(CUSTOM_VERSIONS_PATH, 'r') as f:
+            custom = json.load(f)
+        return list(custom.keys())
+    except Exception as e:
+        logging.warning(f'Failed to load custom versions from {CUSTOM_VERSIONS_PATH}: {e}')
+        return []
+
+
 def all_versions():
     index = fetch_index()
     versions = [k for k in index.keys() if k != 'master']
     versions.sort(key=lambda v: tuple(map(int, v.split('.'))))
+    # Add master version with prefix
+    if 'master' in index:
+        master_version = index['master'].get('version', 'master')
+        versions.append(f'master_{master_version}')
+    # Add custom versions
+    custom_versions = load_custom_versions()
+    versions.extend(custom_versions)
     return versions
 
 
@@ -166,7 +187,35 @@ def download(version, zig_outfile, zls_outfile):
         versions = list(k for k in index.keys() if k != 'master')
         versions.sort(key=lambda v: tuple(map(int, v.split('.'))))
         version = versions[-1]
+    # Handle master_ prefixed versions
+    if version.startswith('master_'):
+        version = 'master'
+    # Handle custom versions - construct download URL from version string
     if version not in index:
+        # Check if this is a custom version (dev version format)
+        # Try to construct the URL: https://ziglang.org/builds/zig-{os}-{arch}-{version}.tar.xz
+        custom_versions = load_custom_versions()
+        if version in custom_versions:
+            os_name = platform.system().lower()
+            arch = platform.machine().lower()
+            os_name = OS_MAPPING.get(os_name, os_name)
+            arch = ARCH_MAPPING.get(arch, arch)
+            url = f'https://ziglang.org/builds/zig-{os_name}-{arch}-{version}.tar.xz'
+            logging.info(f'Downloading custom version {version} from {url}')
+            # For custom versions, we don't have shasum, so we skip verification
+            # Download without shasum verification
+            try:
+                req = urllib.request.Request(url, headers={'User-Agent': USER_AGENT})
+                with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as response:
+                    with open(zig_outfile, 'wb') as f:
+                        while True:
+                            chunk = response.read(1024 * 1024)
+                            if not chunk:
+                                break
+                            f.write(chunk)
+                return
+            except Exception as e:
+                raise Exception(f'Failed to download custom version {version}: {e}')
         raise Exception(f'There is no such version: {version}')
 
     links = index[version]
