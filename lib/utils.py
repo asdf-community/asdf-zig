@@ -203,7 +203,6 @@ def download(version, zig_outfile, zls_outfile):
             url = f'https://ziglang.org/builds/zig-{os_name}-{arch}-{version}.tar.xz'
             logging.info(f'Downloading custom version {version} from {url}')
             # For custom versions, we don't have shasum, so we skip verification
-            import tempfile
             # Download without shasum verification
             try:
                 req = urllib.request.Request(url, headers={'User-Agent': USER_AGENT})
