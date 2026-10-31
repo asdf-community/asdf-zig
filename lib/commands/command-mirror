@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+MFILE="${script_dir}/community-mirrors.txt"
+
+if [ ! -f "$MFILE" ]; then
+  echo "No ${MFILE} file found"
+  exit 1
+fi
+
+cat "$MFILE"

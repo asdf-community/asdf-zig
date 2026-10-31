@@ -5,36 +5,23 @@ import os
 import random
 import platform
 import sys
+import time
 import urllib.request
 from urllib.parse import urljoin
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 import json
 import hashlib
 import logging
 
 INDEX_URL = os.getenv('ASDF_ZIG_INDEX_URL', 'https://ziglang.org/download/index.json')
 HTTP_TIMEOUT = int(os.getenv('ASDF_ZIG_HTTP_TIMEOUT', '30'))
+MIRRORS_MAX_AGE_DAYS = int(os.getenv('ASDF_ZIG_MIRROR_MAX_AGE', '30'))
 USER_AGENT = 'asdf-zig (https://github.com/asdf-community/asdf-zig)'
+MIRRORS_URL = 'https://ziglang.org/download/community-mirrors.txt'
 
-# https://ziglang.org/download/community-mirrors.txt
-# If any of these mirrors are down, please open an issue!
-# Last update at 2026-04-14
-MIRRORS = [
-    'https://pkg.hexops.org/zig',
-    'https://zigmirror.hryx.net/zig',
-    'https://zig.linus.dev/zig',
-    'https://zig.squirl.dev',
-    'https://zig.mirror.mschae23.de/zig',
-    'https://ziglang.freetls.fastly.net',
-    'https://zig.tilok.dev',
-    'https://zig-mirror.tsimnet.eu/zig',
-    'https://zig.karearl.com/zig',
-    'https://pkg.earth/zig',
-    'https://fs.liujiacai.net/zigbuilds',
-    'https://zigmirror.com',
-    'https://zig.chainsafe.dev',
-    'https://zig.savalione.com',
-]
+MIRRORS_FILE = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), 'commands', 'community-mirrors.txt'
+)
 OS_MAPPING = {
     'darwin': 'macos',
 }
@@ -86,6 +73,57 @@ def query_zls(zig_version):
     with http_get(url) as response:
         body = response.read().decode('utf-8')
         return json.loads(body)
+
+
+def parse_mirrors(content):
+    return [
+        line.strip()
+        for line in content.splitlines()
+        if line.strip() and not line.lstrip().startswith('#')
+    ]
+
+
+def update_mirrors():
+    try:
+        with http_get(MIRRORS_URL) as response:
+            content = response.read().decode('utf-8')
+        with open(MIRRORS_FILE, 'w') as mirrors_file:
+            mirrors_file.write(content)
+        return parse_mirrors(content)
+    except (HTTPAccessError, OSError, UnicodeDecodeError, URLError) as e:
+        logging.warning(f'Failed to update mirror list: {e}')
+        return None
+
+
+def load_mirrors():
+    mirrors_file_exists = os.path.exists(MIRRORS_FILE)
+    mirrors_file_stale = (
+        mirrors_file_exists
+        and time.time() - os.path.getmtime(MIRRORS_FILE)
+        > MIRRORS_MAX_AGE_DAYS * 24 * 60 * 60
+    )
+
+    if not mirrors_file_exists:
+        logging.warning(
+            f'Mirror list not found: {MIRRORS_FILE}. '
+            f'Downloading it from {MIRRORS_URL}.'
+        )
+        mirrors = update_mirrors()
+        return mirrors if mirrors is not None else []
+
+    if mirrors_file_stale:
+        logging.info(
+            f'Mirror list is older than {MIRRORS_MAX_AGE_DAYS} days: {MIRRORS_FILE}. '
+            f'Downloading it from {MIRRORS_URL}.'
+        )
+        update_mirrors()
+
+    try:
+        with open(MIRRORS_FILE) as mirrors_file:
+            return parse_mirrors(mirrors_file.read())
+    except OSError as e:
+        logging.warning(f'Failed to read mirror list: {e}')
+        return []
 
 
 def all_versions():
@@ -142,9 +180,10 @@ def download_tarball(out_file, tarball_info, use_mirror=True):
         return
 
     filename = url.split('/')[-1]
-    random.shuffle(MIRRORS)
+    mirrors = load_mirrors()
+    random.shuffle(mirrors)
 
-    for mirror in MIRRORS:
+    for mirror in mirrors:
         try:
             # Ensure base_url has a trailing slash
             mirror = mirror if mirror.endswith('/') else mirror + '/'

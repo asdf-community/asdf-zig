@@ -1,5 +1,7 @@
-set -euo pipefail
+#!/usr/bin/env bash
 
-MFILE="${ASDF_PLUGIN_PATH}/community-mirrors.txt"
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+MFILE="${script_dir}/community-mirrors.txt"
+
 curl -fsSL https://ziglang.org/download/community-mirrors.txt -o "$MFILE"
 echo "Updated ${MFILE} from https://ziglang.org/download/community-mirrors.txt"
